@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scoundrel (Local)</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div>
+          <h1>Scoundrel</h1>
+          <p class="subtitle">Deck-based dungeon crawl (local build)</p>
+        </div>
+        <div class="controls">
+          <button id="newGameBtn">New Game</button>
+          <button id="avoidBtn" disabled>Skip Room</button>
+          <button id="endTurnBtn" disabled>End Turn</button>
+        </div>
+      </header>
+
+      <section class="status">
+        <div class="stat">
+          <span class="label">Health</span>
+          <span id="health">20</span>
+        </div>
+        <div class="stat">
+          <span class="label">Dungeon</span>
+          <span id="dungeonCount">0</span>
+        </div>
+        <div class="stat">
+          <span class="label">Discard</span>
+          <span id="discardCount">0</span>
+        </div>
+        <div class="stat">
+          <span class="label">Weapon</span>
+          <span id="weaponStatus">None</span>
+        </div>
+        <div class="stat">
+          <span class="label">Turn</span>
+          <span id="turnInfo">1</span>
+        </div>
+      </section>
+
+      <main class="table">
+        <div class="pile" aria-label="Dungeon">
+          <div id="dungeonPile" class="pile-card">Dungeon</div>
+        </div>
+
+        <div class="room">
+          <h2>Room</h2>
+          <div id="roomCards" class="card-row"></div>
+          <p class="room-hint">Choose 3 cards each turn. One card stays for the next room.</p>
+        </div>
+
+        <div class="pile" aria-label="Discard">
+          <div class="pile-card">Discard</div>
+        </div>
+      </main>
+
+      <section class="equipment">
+        <div class="weapon-slot">
+          <h2>Equipped Weapon</h2>
+          <div id="weaponCard" class="card weapon">No weapon</div>
+          <div class="weapon-meta">
+            <span>Last slain limit:</span>
+            <strong id="weaponLimit">-</strong>
+          </div>
+        </div>
+        <div class="slain">
+          <h2>Monsters slain by this weapon</h2>
+          <div id="slainList" class="slain-list"></div>
+        </div>
+      </section>
+
+      <section class="log">
+        <h2>Log</h2>
+        <div id="log" class="log-box"></div>
+      </section>
+    </div>
+
+    <dialog id="monsterDialog">
+      <form method="dialog" class="dialog">
+        <h3 id="monsterTitle">Monster</h3>
+        <p id="monsterDesc"></p>
+        <div class="dialog-actions">
+          <button id="useWeaponBtn" value="weapon">Use Weapon</button>
+          <button id="barehandBtn" value="barehand">Barehand</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="gameOverDialog">
+      <form method="dialog" class="dialog">
+        <h3 id="gameOverTitle">Game Over</h3>
+        <p id="gameOverDesc"></p>
+        <div class="dialog-actions">
+          <button value="restart">New Game</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
