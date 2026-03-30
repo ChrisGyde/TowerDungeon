@@ -1,12 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap");
+
 :root {
-  --table-green: #5d8f3a;
-  --table-dark: #3a5f25;
-  --card-bg: #f4f0e6;
-  --card-border: #1f1f1f;
-  --card-shadow: rgba(0, 0, 0, 0.2);
-  --accent: #f2c94c;
-  --text: #1a1a1a;
-  --muted: #556052;
+  --bg-deep: #0c0c0f;
+  --bg-mid: #14151a;
+  --bg-panel: rgba(20, 21, 26, 0.92);
+  --bg-panel-strong: rgba(28, 30, 36, 0.96);
+  --stone: #2a2c33;
+  --ember: #f28b30;
+  --ember-dim: #b76325;
+  --text: #e7e3d8;
+  --muted: #9f9a8e;
+  --card-bg: #1b1d23;
+  --card-border: #3b3d46;
+  --card-shadow: rgba(0, 0, 0, 0.6);
   font-size: 16px;
 }
 
@@ -16,8 +22,11 @@
 
 body {
   margin: 0;
-  font-family: "Source Serif 4", "Georgia", serif;
-  background: radial-gradient(circle at top, #7fb34b, #3c6a2a 70%);
+  font-family: "Cinzel", "Georgia", serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(242, 139, 48, 0.18), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(91, 118, 161, 0.18), transparent 45%),
+    linear-gradient(160deg, var(--bg-deep), #0f1116 45%, #0b0c10 100%);
   color: var(--text);
 }
 
@@ -37,6 +46,7 @@ body {
 h1 {
   margin: 0;
   font-size: 2.2rem;
+  letter-spacing: 1px;
 }
 
 .subtitle {
@@ -51,13 +61,13 @@ h1 {
 
 button {
   border: none;
-  background: var(--accent);
-  color: #1a1a1a;
+  background: linear-gradient(135deg, var(--ember), #ffb45a);
+  color: #23160a;
   padding: 10px 14px;
   font-weight: 700;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 0 #b08b1a;
+  box-shadow: 0 4px 0 var(--ember-dim);
 }
 
 button:disabled {
@@ -74,10 +84,10 @@ button:disabled {
 }
 
 .stat {
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--bg-panel);
   padding: 10px 12px;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: space-between;
   font-weight: 700;
@@ -91,12 +101,12 @@ button:disabled {
 
 #health.damage {
   animation: health-shake 0.35s ease;
-  color: #a91818;
+  color: #e3573d;
 }
 
 #health.heal {
   animation: health-soothe 0.6s ease;
-  color: #1b6b2e;
+  color: #6bdc7c;
 }
 
 .label {
@@ -109,10 +119,12 @@ button:disabled {
   grid-template-columns: 140px 1fr 140px;
   align-items: center;
   gap: 18px;
-  background: var(--table-green);
+  background: radial-gradient(circle at top, #20222a, #14161c 70%);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: inset 0 0 0 6px var(--table-dark);
+  box-shadow:
+    inset 0 0 0 2px #2a2c33,
+    0 16px 30px rgba(0, 0, 0, 0.45);
 }
 
 .pile {
@@ -123,14 +135,14 @@ button:disabled {
 .pile-card {
   width: 120px;
   height: 160px;
-  background: #444;
-  color: #fff;
+  background: linear-gradient(145deg, #1e2129, #14161c);
+  color: #e6e0d2;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  border: 3px solid #222;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+  border: 2px solid #2f323a;
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.45);
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 700;
@@ -145,13 +157,13 @@ button:disabled {
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background: var(--accent);
-  color: #1a1a1a;
+  background: linear-gradient(135deg, var(--ember), #ffb45a);
+  color: #23160a;
   padding: 3px 8px;
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 800;
-  box-shadow: 0 2px 0 #b08b1a;
+  box-shadow: 0 2px 0 var(--ember-dim);
 }
 
 .room h2,
@@ -168,7 +180,7 @@ button:disabled {
 
 .room-hint {
   margin: 8px 0 0;
-  color: #f4f4f4;
+  color: #b9b4a7;
   font-weight: 600;
 }
 
@@ -178,7 +190,7 @@ button:disabled {
   background: var(--card-bg);
   border-radius: 12px;
   border: 2px solid var(--card-border);
-  box-shadow: 0 4px 10px var(--card-shadow);
+  box-shadow: 0 6px 14px var(--card-shadow);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -187,6 +199,7 @@ button:disabled {
   padding: 8px;
   text-align: center;
   cursor: pointer;
+  color: #f2eee4;
 }
 
 .card.deal {
@@ -195,15 +208,18 @@ button:disabled {
 }
 
 .card.monster {
-  background: #f9e1e1;
+  background: linear-gradient(160deg, #311a1a, #1f1416);
+  border-color: #5a3030;
 }
 
 .card.weapon {
-  background: #e8f0f8;
+  background: linear-gradient(160deg, #1b2a3f, #121a24);
+  border-color: #2f4c6a;
 }
 
 .card.potion {
-  background: #fdecc8;
+  background: linear-gradient(160deg, #3a2f16, #1e1a12);
+  border-color: #6c5630;
 }
 
 .card.disabled {
@@ -217,7 +233,7 @@ button:disabled {
 
 .card .card-sub {
   font-size: 0.9rem;
-  color: var(--muted);
+  color: #c9c4b6;
 }
 
 .equipment {
@@ -228,7 +244,7 @@ button:disabled {
 }
 
 .weapon-slot {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--bg-panel-strong);
   border-radius: 12px;
   padding: 16px;
 }
@@ -239,7 +255,7 @@ button:disabled {
 }
 
 .slain {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--bg-panel-strong);
   border-radius: 12px;
   padding: 16px;
 }
@@ -251,15 +267,15 @@ button:disabled {
 }
 
 .slain-tag {
-  background: #fff;
-  border: 1px solid #ccc;
+  background: #15171c;
+  border: 1px solid #2f323a;
   border-radius: 999px;
   padding: 4px 10px;
   font-weight: 700;
 }
 
 .log {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--bg-panel-strong);
   border-radius: 12px;
   padding: 16px;
 }
@@ -267,9 +283,9 @@ button:disabled {
 .log-box {
   max-height: 200px;
   overflow-y: auto;
-  font-family: "Source Code Pro", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.9rem;
-  color: #1f2a1f;
+  color: #c9c5bb;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -277,7 +293,7 @@ button:disabled {
 
 .log-entry {
   padding-bottom: 6px;
-  border-bottom: 1px dashed #c2c2c2;
+  border-bottom: 1px dashed #353844;
 }
 
 .activity {
@@ -288,7 +304,7 @@ button:disabled {
 }
 
 .session {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--bg-panel-strong);
   border-radius: 12px;
   padding: 16px;
 }
@@ -299,21 +315,36 @@ button:disabled {
   gap: 8px;
   max-height: 200px;
   overflow-y: auto;
-  font-family: "Source Code Pro", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.9rem;
 }
 
 .session-entry {
   padding: 6px 8px;
   border-radius: 8px;
-  background: #fff;
-  border: 1px solid #d6d6d6;
+  background: #15171c;
+  border: 1px solid #2f323a;
 }
 
 .dialog {
   padding: 20px;
   min-width: 280px;
-  font-family: "Source Serif 4", serif;
+  font-family: "Cinzel", serif;
+  background: var(--bg-panel-strong);
+  color: var(--text);
+  border: 1px solid #2f323a;
+  border-radius: 12px;
+}
+
+dialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+dialog::backdrop {
+  background: rgba(6, 7, 9, 0.72);
 }
 
 .dialog-actions {
