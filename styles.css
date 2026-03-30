@@ -134,10 +134,24 @@ button:disabled {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 700;
+  position: relative;
 }
 
 .pile-card.dealing {
   animation: shuffle-pulse 0.6s ease;
+}
+
+.pile-count {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: var(--accent);
+  color: #1a1a1a;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 2px 0 #b08b1a;
 }
 
 .room h2,

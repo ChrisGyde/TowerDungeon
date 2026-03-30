@@ -2,6 +2,8 @@ const roomCardsEl = document.getElementById("roomCards");
 const healthEl = document.getElementById("health");
 const dungeonCountEl = document.getElementById("dungeonCount");
 const discardCountEl = document.getElementById("discardCount");
+const dungeonCountBadgeEl = document.getElementById("dungeonCountBadge");
+const discardCountBadgeEl = document.getElementById("discardCountBadge");
 const weaponStatusEl = document.getElementById("weaponStatus");
 const weaponCardEl = document.getElementById("weaponCard");
 const weaponLimitEl = document.getElementById("weaponLimit");
@@ -135,6 +137,8 @@ function updateUI() {
   healthEl.textContent = health;
   dungeonCountEl.textContent = dungeon.length;
   discardCountEl.textContent = discard.length;
+  if (dungeonCountBadgeEl) dungeonCountBadgeEl.textContent = dungeon.length;
+  if (discardCountBadgeEl) discardCountBadgeEl.textContent = discard.length;
   turnInfoEl.textContent = `${turn}`;
 
   weaponStatusEl.textContent = weapon ? `${weapon.name} (value ${weapon.value})` : "None";
