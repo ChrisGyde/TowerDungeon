@@ -15,6 +15,7 @@
         </div>
         <div class="controls">
           <button id="newGameBtn">New Game</button>
+          <button id="rulesBtn">Show Rules</button>
           <button id="avoidBtn" disabled>Skip Room</button>
           <button id="endTurnBtn" disabled>End Turn</button>
         </div>
@@ -97,6 +98,24 @@
         <p id="gameOverDesc"></p>
         <div class="dialog-actions">
           <button value="restart">New Game</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="rulesDialog">
+      <form method="dialog" class="dialog rules-dialog">
+        <h3>How To Play</h3>
+        <div class="rules-body">
+          <p><strong>Setup:</strong> The dungeon contains all Clubs/Spades (Monsters), Diamonds 2-10 (Weapons), Hearts 2-10 (Potions). Start at 20 health.</p>
+          <p><strong>Room:</strong> Draw until 4 cards are face up. Each turn, resolve 3 cards and leave 1 for the next room.</p>
+          <p><strong>Skip:</strong> You may skip a room, placing all 4 cards at the bottom, but never twice in a row.</p>
+          <p><strong>Weapons:</strong> Equipping replaces the previous weapon. After a weapon kills a monster, it can only be used on monsters with value ≤ the last monster it killed.</p>
+          <p><strong>Potions:</strong> Use only one potion per turn; extra potions are discarded. Health caps at 20.</p>
+          <p><strong>Combat:</strong> Barehanded: take full monster damage. Weapon: take monster damage minus weapon strength (minimum 0).</p>
+          <p><strong>End:</strong> Win by clearing the dungeon. Lose if health hits 0.</p>
+        </div>
+        <div class="dialog-actions">
+          <button id="rulesConfirmBtn" value="start">Start Game</button>
         </div>
       </form>
     </dialog>

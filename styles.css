@@ -336,6 +336,23 @@ button:disabled {
   border-radius: 12px;
 }
 
+.rules-dialog {
+  max-width: 560px;
+}
+
+.rules-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "Cinzel", serif;
+  color: #d8d4c8;
+  line-height: 1.4;
+}
+
+.rules-body strong {
+  color: #f3eadb;
+}
+
 dialog {
   border: none;
   padding: 0;

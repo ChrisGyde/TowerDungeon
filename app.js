@@ -11,6 +11,7 @@ const sessionRunsEl = document.getElementById("sessionRuns");
 const avoidBtn = document.getElementById("avoidBtn");
 const endTurnBtn = document.getElementById("endTurnBtn");
 const newGameBtn = document.getElementById("newGameBtn");
+const rulesBtn = document.getElementById("rulesBtn");
 const dungeonPileEl = document.getElementById("dungeonPile");
 
 const monsterDialog = document.getElementById("monsterDialog");
@@ -22,6 +23,8 @@ const barehandBtn = document.getElementById("barehandBtn");
 const gameOverDialog = document.getElementById("gameOverDialog");
 const gameOverTitle = document.getElementById("gameOverTitle");
 const gameOverDesc = document.getElementById("gameOverDesc");
+const rulesDialog = document.getElementById("rulesDialog");
+const rulesConfirmBtn = document.getElementById("rulesConfirmBtn");
 
 const SUITS = ["♣", "♠", "♦", "♥"];
 const VALUES = [
@@ -374,6 +377,12 @@ function endGame(won) {
 avoidBtn.addEventListener("click", avoidRoom);
 endTurnBtn.addEventListener("click", endTurn);
 newGameBtn.addEventListener("click", startGame);
+if (rulesBtn && rulesDialog) {
+  rulesBtn.addEventListener("click", () => {
+    if (rulesConfirmBtn) rulesConfirmBtn.textContent = "Continue Game";
+    rulesDialog.showModal();
+  });
+}
 
 gameOverDialog.addEventListener("close", (event) => {
   if (gameOverDialog.returnValue === "restart") {
@@ -382,3 +391,18 @@ gameOverDialog.addEventListener("close", (event) => {
 });
 
 startGame();
+
+if (rulesDialog) {
+  const seenRules = localStorage.getItem("scoundrel_rules_seen");
+  if (!seenRules) {
+    if (rulesConfirmBtn) rulesConfirmBtn.textContent = "Start Game";
+    rulesDialog.showModal();
+    rulesDialog.addEventListener(
+      "close",
+      () => {
+        localStorage.setItem("scoundrel_rules_seen", "1");
+      },
+      { once: true }
+    );
+  }
+}
