@@ -83,6 +83,22 @@ button:disabled {
   font-weight: 700;
 }
 
+#health {
+  display: inline-block;
+  min-width: 28px;
+  text-align: right;
+}
+
+#health.damage {
+  animation: health-shake 0.35s ease;
+  color: #a91818;
+}
+
+#health.heal {
+  animation: health-soothe 0.6s ease;
+  color: #1b6b2e;
+}
+
 .label {
   color: var(--muted);
   font-weight: 600;
@@ -229,7 +245,6 @@ button:disabled {
 }
 
 .log {
-  margin-top: 20px;
   background: rgba(255, 255, 255, 0.85);
   border-radius: 12px;
   padding: 16px;
@@ -249,6 +264,36 @@ button:disabled {
 .log-entry {
   padding-bottom: 6px;
   border-bottom: 1px dashed #c2c2c2;
+}
+
+.activity {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.session {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.session-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.9rem;
+}
+
+.session-entry {
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #d6d6d6;
 }
 
 .dialog {
@@ -280,6 +325,10 @@ button:disabled {
   .card {
     width: 100%;
   }
+
+  .activity {
+    grid-template-columns: 1fr;
+  }
 }
 
 @keyframes deal-in {
@@ -305,5 +354,41 @@ button:disabled {
   }
   100% {
     transform: translateY(0);
+  }
+}
+
+@keyframes health-shake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes health-soothe {
+  0% {
+    transform: scale(1);
+    text-shadow: none;
+  }
+  40% {
+    transform: scale(1.08);
+    text-shadow: 0 0 8px rgba(46, 173, 86, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    text-shadow: none;
   }
 }

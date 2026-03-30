@@ -8,6 +8,7 @@ const weaponLimitEl = document.getElementById("weaponLimit");
 const slainListEl = document.getElementById("slainList");
 const turnInfoEl = document.getElementById("turnInfo");
 const logEl = document.getElementById("log");
+const sessionRunsEl = document.getElementById("sessionRuns");
 const avoidBtn = document.getElementById("avoidBtn");
 const endTurnBtn = document.getElementById("endTurnBtn");
 const newGameBtn = document.getElementById("newGameBtn");
@@ -52,6 +53,13 @@ let potionUsedThisTurn = false;
 let lastResolved = null; // { type, value }
 let gameOver = false;
 let targetSelections = 3;
+let sessionRuns = [];
+
+function animateHealth(kind) {
+  healthEl.classList.remove("damage", "heal");
+  void healthEl.offsetWidth;
+  healthEl.classList.add(kind);
+}
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i -= 1) {
@@ -91,6 +99,24 @@ function log(message) {
   entry.className = "log-entry";
   entry.textContent = message;
   logEl.prepend(entry);
+}
+
+function renderSessionRuns() {
+  if (!sessionRunsEl) return;
+  sessionRunsEl.innerHTML = "";
+  if (sessionRuns.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "session-entry";
+    empty.textContent = "No runs yet.";
+    sessionRunsEl.append(empty);
+    return;
+  }
+  sessionRuns.forEach((run) => {
+    const row = document.createElement("div");
+    row.className = "session-entry";
+    row.textContent = `#${run.index} ${run.result} | Score ${run.score} | Turns ${run.turns}`;
+    sessionRunsEl.append(row);
+  });
 }
 
 function drawToRoom() {
@@ -162,6 +188,7 @@ function startGame() {
   targetSelections = 3;
   logEl.innerHTML = "";
   log("New game started.");
+  renderSessionRuns();
   drawToRoom();
   updateUI();
 }
@@ -204,9 +231,13 @@ function applyPotion(card) {
   const healed = health - before;
   log(`Used potion ${card.name}. Healed ${healed}.`);
   lastResolved = { type: "potion", value: card.value };
+  if (healed > 0) {
+    animateHealth("heal");
+  }
 }
 
 function fightMonster(card, method) {
+  const before = health;
   if (method === "weapon" && weapon) {
     const damage = Math.max(0, card.value - weapon.value);
     health -= damage;
@@ -219,6 +250,9 @@ function fightMonster(card, method) {
     log(`Fought ${card.name} barehanded. Took ${card.value} damage.`);
   }
   lastResolved = { type: "monster", value: card.value };
+  if (health < before) {
+    animateHealth("damage");
+  }
 }
 
 function handleCardClick(index) {
@@ -328,6 +362,13 @@ function endGame(won) {
     gameOverDesc.textContent = `Final score: ${score}. Health reached ${health}.`;
     log(`You were defeated. Final score ${score}.`);
   }
+  sessionRuns.unshift({
+    index: sessionRuns.length + 1,
+    result: won ? "Escaped" : "Defeated",
+    score,
+    turns: turn,
+  });
+  renderSessionRuns();
   gameOverDialog.showModal();
   updateUI();
 }
