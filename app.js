@@ -4,6 +4,8 @@ const dungeonCountBadgeEl = document.getElementById("dungeonCountBadge");
 const discardCountBadgeEl = document.getElementById("discardCountBadge");
 const weaponCardEl = document.getElementById("weaponCard");
 const weaponLimitEl = document.getElementById("weaponLimit");
+const armorCardEl = document.getElementById("armorCard");
+const armorValueEl = document.getElementById("armorValue");
 const slainListEl = document.getElementById("slainList");
 const turnInfoEl = document.getElementById("turnInfo");
 const logEl = document.getElementById("log");
@@ -47,9 +49,10 @@ let discard = [];
 let room = [];
 let health = 20;
 let weapon = null; // { value, name, lastSlain, slain: [] }
+let armor = null; // { value }
 let turn = 1;
 let avoidedLastRoom = false;
-let selectionsThisTurn = 0;
+let resolvedThisTurn = 0;
 let potionUsedThisTurn = false;
 let lastResolved = null; // { type, value }
 let gameOver = false;
@@ -78,6 +81,7 @@ function buildDeck() {
       id: `monster-${card.value}`,
       name: `${card.value}`,
       value: card.value,
+      hp: card.value,
       type: "monster",
     });
     // Weapons: 2-10 (diamonds)
@@ -94,6 +98,13 @@ function buildDeck() {
         name: `${card.value}`,
         value: card.value,
         type: "potion",
+      });
+      // Armor: 2-10
+      deck.push({
+        id: `armor-${card.value}`,
+        name: `${card.value}`,
+        value: card.value,
+        type: "armor",
       });
     }
   }
@@ -146,6 +157,13 @@ function updateUI() {
   weaponCardEl.textContent = weapon ? `Weapon ${weapon.value}` : "No weapon";
   weaponCardEl.classList.toggle("weapon", Boolean(weapon));
   weaponLimitEl.textContent = weapon?.lastSlain ?? "-";
+  if (armorCardEl) {
+    armorCardEl.textContent = armor ? `Armor ${armor.value}` : "No armor";
+    armorCardEl.classList.toggle("armor", Boolean(armor));
+  }
+  if (armorValueEl) {
+    armorValueEl.textContent = armor ? armor.value : "-";
+  }
 
   slainListEl.innerHTML = "";
   if (weapon && weapon.slain.length > 0) {
@@ -162,20 +180,21 @@ function updateUI() {
     const cardEl = document.createElement("button");
     cardEl.className = `card ${card.type} deal`;
     cardEl.style.animationDelay = `${index * 0.08}s`;
-    if (gameOver || selectionsThisTurn >= targetSelections) {
+    if (gameOver || resolvedThisTurn >= targetSelections) {
       cardEl.classList.add("disabled");
       cardEl.disabled = true;
     }
+    const title = card.type === "monster" ? `${card.hp}/${card.value}` : `${card.value}`;
     cardEl.innerHTML = `
-      <div class="card-title">${card.value}</div>
+      <div class="card-title">${title}</div>
       <div class="card-sub">${card.type}</div>
     `;
     cardEl.addEventListener("click", () => handleCardClick(index));
     roomCardsEl.append(cardEl);
   });
 
-  avoidBtn.disabled = gameOver || avoidedLastRoom || room.length < 4 || selectionsThisTurn > 0;
-  endTurnBtn.disabled = gameOver || selectionsThisTurn < targetSelections;
+  avoidBtn.disabled = gameOver || avoidedLastRoom || room.length < 4 || resolvedThisTurn > 0;
+  endTurnBtn.disabled = gameOver || resolvedThisTurn < targetSelections;
 }
 
 function startGame() {
@@ -184,9 +203,10 @@ function startGame() {
   room = [];
   health = 20;
   weapon = null;
+  armor = null;
   turn = 1;
   avoidedLastRoom = false;
-  selectionsThisTurn = 0;
+  resolvedThisTurn = 0;
   potionUsedThisTurn = false;
   lastResolved = null;
   gameOver = false;
@@ -211,6 +231,12 @@ function discardWeapon() {
   weapon = null;
 }
 
+function discardArmor() {
+  if (!armor) return;
+  discard.push({ type: "armor", value: armor.value });
+  armor = null;
+}
+
 function equipWeapon(card) {
   discardWeapon();
   weapon = {
@@ -221,6 +247,30 @@ function equipWeapon(card) {
   };
   discard.push(card);
   log(`Equipped weapon ${card.value}.`);
+}
+
+function equipArmor(card) {
+  discardArmor();
+  armor = { value: card.value };
+  discard.push(card);
+  log(`Equipped armor ${card.value}.`);
+}
+
+function applyDamage(amount) {
+  let remaining = amount;
+  if (armor && remaining > 0) {
+    const absorbed = Math.min(armor.value, remaining);
+    armor.value -= absorbed;
+    remaining -= absorbed;
+    log(`Armor absorbed ${absorbed} damage.`);
+    if (armor.value <= 0) {
+      armor = null;
+      log("Armor broke.");
+    }
+  }
+  if (remaining > 0) {
+    health -= remaining;
+  }
 }
 
 function applyPotion(card) {
@@ -244,13 +294,19 @@ function applyPotion(card) {
 function fightMonster(card, method) {
   const before = health;
   if (method === "weapon" && weapon) {
-    const damage = Math.max(0, card.value - weapon.value);
-    health -= damage;
-    weapon.lastSlain = card.value;
-    weapon.slain.push(card);
-    log(`Fought monster ${card.value} with weapon. Took ${damage} damage.`);
+    const damage = weapon.value;
+    const beforeHp = card.hp;
+    card.hp = Math.max(0, card.hp - damage);
+    applyDamage(beforeHp);
+    if (card.hp === 0) {
+      weapon.lastSlain = card.value;
+      weapon.slain.push(card);
+      log(`Hit monster ${card.value} with weapon for ${damage}. Monster defeated.`);
+    } else {
+      log(`Hit monster ${card.value} with weapon for ${damage}. ${card.hp} health left. Took ${beforeHp} damage.`);
+    }
   } else {
-    health -= card.value;
+    applyDamage(card.value);
     discard.push(card);
     log(`Fought monster ${card.value} barehanded. Took ${card.value} damage.`);
   }
@@ -261,7 +317,7 @@ function fightMonster(card, method) {
 }
 
 function handleCardClick(index) {
-  if (gameOver || selectionsThisTurn >= targetSelections) return;
+  if (gameOver || resolvedThisTurn >= targetSelections) return;
 
   const card = room[index];
   if (!card) return;
@@ -269,12 +325,17 @@ function handleCardClick(index) {
   if (card.type === "weapon") {
     equipWeapon(card);
     room.splice(index, 1);
-    selectionsThisTurn += 1;
+    resolvedThisTurn += 1;
+    updateTurnState();
+  } else if (card.type === "armor") {
+    equipArmor(card);
+    room.splice(index, 1);
+    resolvedThisTurn += 1;
     updateTurnState();
   } else if (card.type === "potion") {
     applyPotion(card);
     room.splice(index, 1);
-    selectionsThisTurn += 1;
+    resolvedThisTurn += 1;
     updateTurnState();
   } else if (card.type === "monster") {
     const canUseWeapon = canUseWeaponOn(card);
@@ -289,8 +350,13 @@ function handleCardClick(index) {
         const choice = monsterDialog.returnValue;
         const method = choice === "weapon" ? "weapon" : "barehand";
         fightMonster(card, method);
-        room.splice(index, 1);
-        selectionsThisTurn += 1;
+        if (card.hp === 0 || method === "barehand") {
+          room.splice(index, 1);
+          if (card.hp === 0) {
+            discard.push(card);
+          }
+          resolvedThisTurn += 1;
+        }
         updateTurnState();
       };
 
@@ -298,7 +364,7 @@ function handleCardClick(index) {
     } else {
       fightMonster(card, "barehand");
       room.splice(index, 1);
-      selectionsThisTurn += 1;
+      resolvedThisTurn += 1;
       updateTurnState();
     }
   }
@@ -310,15 +376,15 @@ function updateTurnState() {
     return;
   }
 
-  if (selectionsThisTurn >= targetSelections) {
+  if (resolvedThisTurn >= targetSelections) {
     endTurnBtn.disabled = false;
   }
   updateUI();
 }
 
 function endTurn() {
-  if (selectionsThisTurn < targetSelections || gameOver) return;
-  selectionsThisTurn = 0;
+  if (resolvedThisTurn < targetSelections || gameOver) return;
+  resolvedThisTurn = 0;
   potionUsedThisTurn = false;
   avoidedLastRoom = false;
   turn += 1;
@@ -332,11 +398,11 @@ function endTurn() {
 }
 
 function avoidRoom() {
-  if (avoidedLastRoom || room.length < 4 || selectionsThisTurn > 0) return;
+  if (avoidedLastRoom || room.length < 4 || resolvedThisTurn > 0) return;
   dungeon.push(...room);
   room = [];
   avoidedLastRoom = true;
-  selectionsThisTurn = 0;
+  resolvedThisTurn = 0;
   potionUsedThisTurn = false;
   turn += 1;
   log("Skipped the room. Cards placed at the bottom of the dungeon.");
