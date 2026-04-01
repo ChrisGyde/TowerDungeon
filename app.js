@@ -26,7 +26,6 @@ const gameOverDesc = document.getElementById("gameOverDesc");
 const rulesDialog = document.getElementById("rulesDialog");
 const rulesConfirmBtn = document.getElementById("rulesConfirmBtn");
 
-const SUITS = ["♣", "♠", "♦", "♥"];
 const VALUES = [
   { name: "2", value: 2 },
   { name: "3", value: 3 },
@@ -73,23 +72,28 @@ function shuffle(array) {
 
 function buildDeck() {
   const deck = [];
-  for (const suit of SUITS) {
-    for (const card of VALUES) {
-      const isRed = suit === "♦" || suit === "♥";
-      if (isRed && (card.name === "J" || card.name === "Q" || card.name === "K" || card.name === "A")) {
-        continue;
-      }
-      const type = suit === "♣" || suit === "♠" ? "monster" : suit === "♦" ? "weapon" : "potion";
-      if (type === "weapon" || type === "potion") {
-        if (card.value < 2 || card.value > 10) {
-          continue;
-        }
-      }
+  for (const card of VALUES) {
+    // Monsters: 2-14 (clubs/spades)
+    deck.push({
+      id: `monster-${card.value}`,
+      name: `${card.value}`,
+      value: card.value,
+      type: "monster",
+    });
+    // Weapons: 2-10 (diamonds)
+    if (card.value >= 2 && card.value <= 10) {
       deck.push({
-        id: `${card.name}${suit}-${type}`,
-        name: `${card.name}${suit}`,
+        id: `weapon-${card.value}`,
+        name: `${card.value}`,
         value: card.value,
-        type,
+        type: "weapon",
+      });
+      // Potions: 2-10 (hearts)
+      deck.push({
+        id: `potion-${card.value}`,
+        name: `${card.value}`,
+        value: card.value,
+        type: "potion",
       });
     }
   }
@@ -139,7 +143,7 @@ function updateUI() {
   if (discardCountBadgeEl) discardCountBadgeEl.textContent = discard.length;
   turnInfoEl.textContent = `${turn}`;
 
-  weaponCardEl.textContent = weapon ? weapon.name : "No weapon";
+  weaponCardEl.textContent = weapon ? `Weapon ${weapon.value}` : "No weapon";
   weaponCardEl.classList.toggle("weapon", Boolean(weapon));
   weaponLimitEl.textContent = weapon?.lastSlain ?? "-";
 
@@ -148,7 +152,7 @@ function updateUI() {
     weapon.slain.forEach((monster) => {
       const tag = document.createElement("span");
       tag.className = "slain-tag";
-      tag.textContent = monster.name;
+      tag.textContent = monster.value;
       slainListEl.append(tag);
     });
   }
@@ -163,7 +167,7 @@ function updateUI() {
       cardEl.disabled = true;
     }
     cardEl.innerHTML = `
-      <div class="card-title">${card.name}</div>
+      <div class="card-title">${card.value}</div>
       <div class="card-sub">${card.type}</div>
     `;
     cardEl.addEventListener("click", () => handleCardClick(index));
@@ -216,13 +220,13 @@ function equipWeapon(card) {
     slain: [],
   };
   discard.push(card);
-  log(`Equipped weapon ${card.name} (value ${card.value}).`);
+  log(`Equipped weapon ${card.value}.`);
 }
 
 function applyPotion(card) {
   if (potionUsedThisTurn) {
     discard.push(card);
-    log(`Discarded extra potion ${card.name}. Already used one this turn.`);
+    log(`Discarded extra potion ${card.value}. Already used one this turn.`);
     return;
   }
   potionUsedThisTurn = true;
@@ -230,7 +234,7 @@ function applyPotion(card) {
   health = Math.min(20, health + card.value);
   discard.push(card);
   const healed = health - before;
-  log(`Used potion ${card.name}. Healed ${healed}.`);
+  log(`Used potion ${card.value}. Healed ${healed}.`);
   lastResolved = { type: "potion", value: card.value };
   if (healed > 0) {
     animateHealth("heal");
@@ -244,11 +248,11 @@ function fightMonster(card, method) {
     health -= damage;
     weapon.lastSlain = card.value;
     weapon.slain.push(card);
-    log(`Fought ${card.name} with weapon. Took ${damage} damage.`);
+    log(`Fought monster ${card.value} with weapon. Took ${damage} damage.`);
   } else {
     health -= card.value;
     discard.push(card);
-    log(`Fought ${card.name} barehanded. Took ${card.value} damage.`);
+    log(`Fought monster ${card.value} barehanded. Took ${card.value} damage.`);
   }
   lastResolved = { type: "monster", value: card.value };
   if (health < before) {
@@ -275,7 +279,7 @@ function handleCardClick(index) {
   } else if (card.type === "monster") {
     const canUseWeapon = canUseWeaponOn(card);
     if (weapon && canUseWeapon) {
-      monsterTitle.textContent = `Monster ${card.name}`;
+      monsterTitle.textContent = `Monster ${card.value}`;
       monsterDesc.textContent = `Choose how to fight. Weapon value ${weapon.value}.`;
       useWeaponBtn.disabled = false;
       monsterDialog.showModal();
